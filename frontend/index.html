@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lingo (4-Letter Word Game)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="game-container">
+    <h1>Lingo Game</h1>
+    <div class="score-section">
+      <p>Score: <span id="score">0</span></p>
+    </div>
+    <div id="board" class="game-board"></div>
+    <div class="input-section">
+      <input type="text" id="word-input" maxlength="4" placeholder="Enter 4-letter word">
+      <button id="submit-btn">Submit</button>
+    </div>
+    <div id="message" class="message"></div>
+    <button id="new-game-btn" style="margin-top: 20px;">New Game</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
