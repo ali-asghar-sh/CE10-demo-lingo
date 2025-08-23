@@ -25,6 +25,13 @@ const words = [
     "LAMP", "MOON", "RAIN", "STAR", "TREE", "WIND", "BOOK",
     "COAT", "DESK", "GATE", "HAND", "JUMP", "KING", "LAKE",
     "MAIL", "NOSE", "OPEN", "PARK", "QUIT", "ROAD", "SHIP"
+    ,"SONG", "SNOW", "BIRD", "CLOUD", "FISH", "FROG", "GRASS",
+    "HILL", "HOME", "ICE", "KITE", "LEAF", "LOCK", "MATH",
+    "MILK", "NOTE", "PEAR", "RING", "ROCK", "SEA", "SHOE",
+    "SOUP", "TIME", "TOY", "WALL", "WAVE", "WOOL", "ZERO",
+    "BAND", "BATH", "BELL", "BONE", "BUS", "CAMP", "CARD",
+    "DARK", "DISH", "DREAM", "DRUM", "DUST", "FACE", "FARM",
+    "FEAR", "FLAG", "FOOT", "GAME", "GIFT", "HAIR", "HAT", "JOKE"
 ];
 
 // Health check endpoint
@@ -122,5 +129,4 @@ app.listen(port, () => {
 process.on('SIGTERM', async () => {
     console.log('Shutting down gracefully...');
     await redisClient.quit();
-    process.exit(0);
-});
+    process.exit(0)
