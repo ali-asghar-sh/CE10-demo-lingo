@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameActive = false;
 
     // API Configuration - use full URL for local development
-    const API_BASE = 'http://localhost:3000/api';
+    const API_BASE = '/api';
 
     // Initialize the game board with first letter revealed
     function initBoard() {
