@@ -6,10 +6,12 @@ const redis = require('redis');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Redis connection
+// Redis connection (v4+ syntax)
 const redisClient = redis.createClient({
-    host: process.env.REDIS_HOST || 'redis-service',
-    port: process.env.REDIS_PORT || 6379
+    socket: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || 6379
+    }
 });
 
 // Middleware
@@ -19,13 +21,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// 4-letter words (same as your original list)
+// Serve static files from frontend directory
+app.use(express.static('../frontend'));
+
+// 4-letter words list
 const words = [
     "LOVE", "FIRE", "BEAR", "CAKE", "DUCK", "GOLD", "HOPE",
     "LAMP", "MOON", "RAIN", "STAR", "TREE", "WIND", "BOOK",
     "COAT", "DESK", "GATE", "HAND", "JUMP", "KING", "LAKE",
-    "MAIL", "NOSE", "OPEN", "PARK", "QUIT", "ROAD", "SHIP"
-    ,"SONG", "SNOW", "BIRD", "CLAP", "FISH", "FROG", "GOAL",
+    "MAIL", "NOSE", "OPEN", "PARK", "QUIT", "ROAD", "SHIP",
+    "SONG", "SNOW", "BIRD", "CLAP", "FISH", "FROG", "GOAL",
     "HILL", "HOME", "ICE", "KITE", "LEAF", "LOCK", "MATH",
     "MILK", "NOTE", "PEAR", "RING", "ROCK", "SEA", "SHOE",
     "SOUP", "TIME", "TOY", "WALL", "WAVE", "WOOL", "ZERO",
@@ -70,11 +75,11 @@ app.post('/api/score', async (req, res) => {
 
         console.log('Received score:', scoreData);
 
-        // Store in Redis list
-        await redisClient.lpush('game_scores', JSON.stringify(scoreData));
+        // Store in Redis list (v4+ syntax)
+        await redisClient.lPush('game_scores', JSON.stringify(scoreData));
         
         // Keep only last 100 scores
-        await redisClient.ltrim('game_scores', 0, 99);
+        await redisClient.lTrim('game_scores', 0, 99);
         
         console.log('Score saved successfully');
         res.json({ 
@@ -91,7 +96,7 @@ app.post('/api/score', async (req, res) => {
 // Get high scores endpoint
 app.get('/api/scores', async (req, res) => {
     try {
-        const scores = await redisClient.lrange('game_scores', 0, 9); // Get top 10
+        const scores = await redisClient.lRange('game_scores', 0, 9); // Get top 10
         const parsedScores = scores.map(score => JSON.parse(score));
         
         // Sort by score descending
@@ -111,10 +116,17 @@ app.get('/api/scores', async (req, res) => {
 // Initialize Redis connection
 async function initRedis() {
     try {
+        console.log('Attempting to connect to Redis...');
         await redisClient.connect();
-        console.log('Connected to Redis');
+        console.log('✅ Connected to Redis successfully');
+        
+        // Test Redis is working
+        await redisClient.set('test', 'hello');
+        const result = await redisClient.get('test');
+        console.log('✅ Redis test successful:', result);
+        
     } catch (error) {
-        console.error('Redis connection error:', error);
+        console.error('❌ Redis connection error:', error.message);
         console.log('Continuing without Redis...');
     }
 }
@@ -128,6 +140,21 @@ app.listen(port, () => {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
     console.log('Shutting down gracefully...');
-    await redisClient.quit();
+    try {
+        await redisClient.quit();
+    } catch (error) {
+        console.log('Error closing Redis connection:', error.message);
+    }
+    process.exit(0);
+});
+
+// Handle uncaught exceptions
+process.on('SIGINT', async () => {
+    console.log('Received SIGINT, shutting down gracefully...');
+    try {
+        await redisClient.quit();
+    } catch (error) {
+        console.log('Error closing Redis connection:', error.message);
+    }
     process.exit(0);
 });
