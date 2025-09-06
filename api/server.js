@@ -16,7 +16,7 @@ const redisClient = redis.createClient({
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:8000', 'http://127.0.0.1:8000'],
+    origin: true,  // Allows all origins
     credentials: true
 }));
 app.use(express.json());
